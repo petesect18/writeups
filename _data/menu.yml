@@ -5,28 +5,17 @@ entries:
   - title: info
     url: false
     entries:
-      - title: Preparacion para el OSCP - Diferentes writeups de la lista de TJ_Null y The Mayor.
+      - title: Preparacion para el OSCP - Diferentes writeups de la lista de TJ_Null, The Mayor, adicional a mi experiencia en este viaje de resistencia y dedicacion. 
         url: false
 
-
-  - title: thoughts
+  - title: Maquinas 
     post_list: true
     url: false
     entries: false
 
-  - title: rss
+  - title: Metodologia y experiencias
     url: feed.xml
 
-  - title: another list
-    url: false
-    entries:
-      - title: with subitems
-        url: false
-        entries:
-          - title: with subsubitems
-            url: false
-          - title: example page
-            url: about
   - title: PRO TIP
     url: false
     entries:
