@@ -7,7 +7,7 @@ categories: HackTheBox
 
 ## HTB Lame ##
 
-![Pic](/assets/Lame/Picture.png)
+![Pic](writeups/assets/Lame/Picture.png)
 
 ### Reconocimiento ###
 
