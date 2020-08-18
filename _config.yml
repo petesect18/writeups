@@ -1,9 +1,9 @@
-title: no style, please! # name of the site
-author: Riccardo Graziosi # name of site's author
-email: riccardo.graziosi97@gmail.com # email of site's author
-url: https://riggraz.dev/no-style-please # root address of the site
+title: Writeups! # name of the site
+author: P3T3x # name of site's author
+email: noemail@gmail.com # email of site's author
+url: https://petesect18.github.io/writeups # root address of the site
 description: > # description of the site (multiple lines allowed)
-  A (nearly) no-CSS, fast, minimalist Jekyll theme.
+  En preparacion para el OSCP, diferentes writeups de la lista de TJ Null y The Mayor.
 
 permalink: /:slug.html
 

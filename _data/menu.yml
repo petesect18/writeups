@@ -2,36 +2,17 @@
 # https://github.com/riggraz/no-style-please#customize-the-menu
 
 entries:
-  - title: info
+  - title: Info
     url: false
     entries:
-      - title: a (nearly) no-CSS, fast, minimalist Jekyll theme.
+      - title: Preparacion para el OSCP - Diferentes writeups de la lista de TJ_Null, The Mayor, adicional a mi experiencia en este viaje de resistencia y dedicacion. 
         url: false
-      - title: github
-        url: https://github.com/riggraz/no-style-please
-      - title: used by riggraz.dev
-        url: https://riggraz.dev/
 
-  - title: thoughts
+  - title: Maquinas 
     post_list: true
     url: false
     entries: false
 
-  - title: rss
+  - title: Metodologia y experiencias
     url: feed.xml
 
-  - title: another list
-    url: false
-    entries:
-      - title: with subitems
-        url: false
-        entries:
-          - title: with subsubitems
-            url: false
-          - title: example page
-            url: about
-  - title: PRO TIP
-    url: false
-    entries:
-      - title: to edit this menu, edit _data/menu.yml file
-        url: false
